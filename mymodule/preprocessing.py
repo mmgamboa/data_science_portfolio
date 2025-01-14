@@ -5,7 +5,8 @@ from sklearn.linear_model import LinearRegression
 
 __all__ = ['apply_filter_by_dates', 
            'OutlierRemover', 
-           'fit_line']
+           'fit_line',
+           'fit_adaptative_line']
 
 def apply_filter_by_dates(data, initial_date, end_date):
     """ 
@@ -130,47 +131,3 @@ def fit_adaptative_line(X, y, residuals, initial_date, end_date, outlier_strateg
         print("!Outliers account for Fitting computation!")   
         
     return  x_pred_no_outliers, y_pred_no_outliers, accepted_idxs
-
-def check_border_cases():
-    pass
-
-
-"""
-    outlier_removal = pp.OutlierRemover(outlier_strategy, threshold)
-
-# Remove outliers based on the threshold
-_, accepted_idxs = outlier_removal.remove_outliers(residuals, border_cases=False)
-X_no_outliers = X[accepted_idxs]
-y_no_outliers = y[accepted_idxs]
-
-print(f"Fitting line from {initial_date} to {end_date}. ======================")
-
-# Fit the model without outliers
-x_pred_no_outliers, y_pred_no_outliers, fitted_model = pp.fit_line(X_no_outliers, y_no_outliers, nvals=100)
-score_fix_border = fitted_model.score(X_no_outliers, y_no_outliers)
-
-### Compute Score for linear regression considering 10% greater the outlier limit to account for border cases if improve the score
-_, accepted_idxs_var = outlier_removal.remove_outliers(residuals, border_cases=True)
-X_no_outliers_var = X[accepted_idxs_var]
-y_no_outliers_var = y[accepted_idxs_var]
-# Fit the model without outliers
-x_pred_no_outliers_var, y_pred_no_outliers_var, fitted_model_var = pp.fit_line(X_no_outliers_var,
-                                                                                y_no_outliers_var, 
-                                                                                nvals=100)
-score_var_border = fitted_model_var.score(X_no_outliers_var, y_no_outliers_var)
-if score_fix_border >= score_var_border:
-    x_pred_no_outliers = x_pred_no_outliers
-    y_pred_no_outliers = y_pred_no_outliers
-    accepted_idxs = accepted_idxs
-else:
-    x_pred_no_outliers = x_pred_no_outliers_var
-    y_pred_no_outliers = y_pred_no_outliers_var
-    accepted_idxs = accepted_idxs_var
-    print("!Outliers account for Fitting computation!")    
-
-
-
-
-
-
-"""
