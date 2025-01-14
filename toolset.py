@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 
-__all__ = ['OutlierRemover', 'find_closest_date', 'compute_daily_return']
+__all__ = ['find_closest_date', 
+           'compute_daily_return_one',
+           'compute_daily_return']
 
 # Create a function to search a valid date closer to the one provider by user
 def find_closest_date(date, full_indexes):
