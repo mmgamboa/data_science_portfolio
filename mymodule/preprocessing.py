@@ -29,19 +29,38 @@ def apply_filter_by_dates(data, initial_date, end_date):
         (data.index >= initial_date) & 
         (data.index <= end_date)
     ]
-    return filtered_data
+    return pd.DataFrame(filtered_data)
 
-def fit_line(x,y, nvals=100):
+def fit_line(x,y, nvals=100, verbose=True):
     """Returns the x_pred and y_pred of the linear regression
-    and the model"""
+    and the model.
+    
+    Parameters
+    ----------
+    x: np.array
+        x values
+    y: np.array
+        y values
+    nvals: int
+    
+    Returns
+    -------
+    x_pred_: np.array
+        x values predicted
+    y_pred_: np.array
+        y values predicted
+    reg: LinearRegression
+        Linear regression model fitted
+    """
     reg = LinearRegression(fit_intercept=True).fit(x, y)
 
     # Get the score of the model
-    print(f"Score: {reg.score(x,y):10.9f}")
-    print(f"Coef: {reg.coef_[0]:3.2} - {reg.intercept_:1.5f}")
+    if verbose:
+        print(f"Score: {reg.score(x,y):10.9f}")
+        print(f"Coef: {reg.coef_[0]:3.2} - {reg.intercept_:1.5f}")
 
     # Predict the data
-    x_pred_ = np.linspace(x.min()- np.abs(x.min())*5, x.max()+ x.max()*5, 100)
+    x_pred_ = np.linspace(x.min()- np.abs(x.min())*5, x.max()+ x.max()*5, nvals)
     y_pred_ = reg.predict(x_pred_.reshape(-1, 1))
 
     return x_pred_, y_pred_, reg
@@ -54,7 +73,16 @@ class OutlierRemover:
         self.threshold = threshold
     
     def std_strategy(self, data, border_cases=False):
-    
+        """
+        Remove outliers using the standard deviation strategy
+        
+        Args:
+            data (pd.Series): _description_
+            border_cases (bool, optional): _description_. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
         mean = data.mean()
         std = data.std()
     
@@ -70,6 +98,16 @@ class OutlierRemover:
     
     def iqr_strategy(self, data, border_cases=False):
         """
+        Remove outliers using the IQR strategy
+        
+        Args:
+        data: pd.Series
+        border_cases: bool
+        
+        Returns:
+        data without outliers: pd.Series
+        accepted_idxs: pd.Series       
+        
         If border_cases = True: consider the 10% greater and 10% lower values
         This is useful for border cases where the data is not normally distributed
         """
@@ -91,13 +129,43 @@ class OutlierRemover:
         return data, accepted_idxs
     
     def remove_outliers(self, data, border_cases=False):
+        """
         
+        
+        """
         if self.strategy == 'std':
             return self.std_strategy(data, border_cases=border_cases)
         elif self.strategy == 'iqr':
             return self.iqr_strategy(data, border_cases=border_cases)
     
 def fit_adaptative_line(X, y, residuals, initial_date, end_date, outlier_strategy, threshold):
+    """
+    Fit a line to the data considering the outliers
+    
+    Parameters
+    ----------
+    X: np.array
+        x values
+    y: np.array
+        y values
+    residuals: np.array
+        residuals of the model
+    initial_date: str
+    end_date: str
+    outlier_strategy: str
+        'std' or 'iqr'
+    threshold: float
+    
+    Returns
+    -------
+    x_pred_no_outliers: np.array
+        x values predicted without outliers
+    y_pred_no_outliers: np.array
+        y values predicted without outliers
+    accepted_idxs: np.array
+        indexes of the accepted values   
+    """
+    
     
     outlier_removal = OutlierRemover(outlier_strategy, threshold)
 
@@ -117,8 +185,8 @@ def fit_adaptative_line(X, y, residuals, initial_date, end_date, outlier_strateg
     y_no_outliers_var = y[accepted_idxs_var]
     # Fit the model without outliers
     x_pred_no_outliers_var, y_pred_no_outliers_var, fitted_model_var = fit_line(X_no_outliers_var,
-                                                                                   y_no_outliers_var, 
-                                                                                   nvals=100)
+                                                                                y_no_outliers_var, 
+                                                                                nvals=100)
     score_var_border = fitted_model_var.score(X_no_outliers_var, y_no_outliers_var)
     if score_fix_border >= score_var_border:
         x_pred_no_outliers = x_pred_no_outliers
