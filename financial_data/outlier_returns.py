@@ -138,6 +138,13 @@ register_callbacks(app,
                    ydata_label, 
                    dates)
 
+## Run server
+#if __name__ == '__main__':
+#    app.run_server(host=HOST, port=PORT, debug=DEBUG)
+
+# Get the port dynamically
+PORT = int(os.environ.get("PORT", 10000))  # Render provides the PORT variable
+
 # Run server
 if __name__ == '__main__':
-    app.run_server(host=HOST, port=PORT, debug=DEBUG)
+    app.run_server(host="0.0.0.0", port=PORT, debug=DEBUG)
