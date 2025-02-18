@@ -23,8 +23,6 @@ Date: January 10th, 2025
 import os
 from yaml_env_tag import construct_env_tag
 import yaml
-# Register the !ENV tag
-yaml.add_constructor('!ENV', construct_env_tag)
 
 import plotly.express as px
 
@@ -38,7 +36,25 @@ from src.visualization.plot_lib import (plot_scatter_returns,
 from src.models.layout import create_layout
 from src.models.callbacks import register_callbacks
 
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Example usage
+logging.info("Starting the Dash app...")
+
 # Load configutration file
+print("====================================")
+print(" ")
+print(os.environ["DS_DIR"])
+logging.info(f"Loading configuration file from {os.environ['DS_DIR']}/financial_data/config.yaml")
+# Look if there exists a configuration file
+if not os.path.exists(f"{os.environ["DS_DIR"]}/financial_data/config.yaml"):
+    logging.error("Configuration file not found.")
+    raise FileNotFoundError("Configuration file not found.")
+print(" ")
+print("====================================")
 with open(f"{os.environ["DS_DIR"]}/financial_data/config.yaml", 'r') as file:
     config = yaml.safe_load(file)
 
