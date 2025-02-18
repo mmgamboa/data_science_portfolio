@@ -1,6 +1,6 @@
 numpy
 gunicorn
-sklearn
+scikit-learn
 seaborn
 yfinance
 pandas==2.1.4
