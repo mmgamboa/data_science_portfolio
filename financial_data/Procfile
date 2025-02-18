@@ -1,1 +1,1 @@
-web: gunicorn outlier_returns:app.server --bind 0.0.0.0:$PORT
+web: gunicorn outlier_returns:server --bind 0.0.0.0:$PORT
