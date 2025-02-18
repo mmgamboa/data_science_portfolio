@@ -21,7 +21,6 @@ Date: January 10th, 2025
 """
 # Load specific packages
 import os
-from yaml_env_tag import construct_env_tag
 import yaml
 
 import plotly.express as px
