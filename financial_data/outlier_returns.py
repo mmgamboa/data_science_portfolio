@@ -42,6 +42,11 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %
 
 # Example usage
 logging.info("Starting the Dash app...")
+# Print current working directory and listed files
+logging.info(f"Current working directory: {os.getcwd()}")
+logging.info(f"List of files in the current working directory: {os.listdir()}")
+# Print environment variables
+logging.info(f"Environment variables: {os.environ}")
 
 # Load configutration file
 with open(f"./financial_data/config.yaml", 'r') as file:
