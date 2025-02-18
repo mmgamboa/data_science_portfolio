@@ -1,0 +1,32 @@
+server:
+  host: 127.0.0.1
+  port: 8050
+  debug: True
+# Directory configuration
+paths:
+  root: financial_data/
+  raw: data/raw/
+  processed: data/processed/
+  reports: reports/
+
+savefigs: True
+plot_verbosity: True
+
+financial_param: Adj Close
+
+# List of supported currencies
+companies_name:
+  - MELI
+  - MSFT
+  - AAPL
+  - HPQ
+
+companies_fit:
+  - QQQ
+  - IWM
+
+download_params:
+  interval: 1d
+  start_date: 2024-02-01
+  end_date: 2025-02-01
+  period: 2y
