@@ -84,7 +84,7 @@ PATH_REPORTS_DIR = root_dir+reports_dir
 plot_verbosity = config["plot_verbosity"]
 # Server setup
 HOST = config["server"]["host"]
-PORT = config["server"]["port"]
+PORT = int(os.environ.get("PORT", 10000))  # Render provides the PORT variable
 DEBUG = config["server"]["debug"]
 # Import the download method from get_data.py
 
@@ -147,9 +147,6 @@ register_callbacks(app,
 ## Run server
 #if __name__ == '__main__':
 #    app.run_server(host=HOST, port=PORT, debug=DEBUG)
-
-# Get the port dynamically
-PORT = int(os.environ.get("PORT", 10000))  # Render provides the PORT variable
 
 # Run server
 if __name__ == '__main__':
