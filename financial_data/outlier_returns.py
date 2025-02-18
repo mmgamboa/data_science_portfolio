@@ -119,7 +119,7 @@ server = Flask(__name__)
 ## Initialize Dash app
 #app = Dash(__name__)
 # Initialize Dash app
-app = dash.Dash(__name__, server=server)  # Attach Flask server
+app = Dash(__name__, server=server)  # Attach Flask server
 
 # Generate plots
 fig_log_return = plot_log_return_difference(log_returns_difference, [compname1, compname2])
