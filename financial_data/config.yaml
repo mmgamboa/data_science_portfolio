@@ -4,7 +4,7 @@ server:
   debug: True
 # Directory configuration
 paths:
-  root: /home/mgamboalerena/Documentos/data_science_portfolio/financial_data
+  root: financial_data/
   raw: data/raw/
   processed: data/processed/
   reports: reports/

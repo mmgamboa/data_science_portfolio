@@ -36,7 +36,6 @@ def register_callbacks(app, log_returns_difference, full_indexes, xdata_label, y
         print(f"Time elapsed in preprocessing, outliers, and fitting: {time.time() - t0}")
         
         #monitor_resources()
-
         # Create the figure
         fig = go.Figure()
         fig.add_scatter(x=x_pred, y=y_pred, mode="markers", line=dict(color="red"), name='Fitted line')
@@ -49,6 +48,5 @@ def register_callbacks(app, log_returns_difference, full_indexes, xdata_label, y
         fig.update_xaxes(title_text=xdata_label, range=[X.min()-np.abs(X.min())*0.1, X.max()+np.abs(X.max())*0.1])
         fig.update_yaxes(title_text=ydata_label, range=[y.min()-np.abs(y.min())*0.1, y.max()+np.abs(y.max())*0.1])
         fig.update_layout(legend=dict(orientation="h", x=0, y=-0.2))
-
         #monitor_resources()
         return fig

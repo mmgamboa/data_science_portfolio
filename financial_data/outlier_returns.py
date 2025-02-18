@@ -20,7 +20,11 @@ Date: January 10th, 2025
 
 """
 # Load specific packages
+import os
+from yaml_env_tag import construct_env_tag
 import yaml
+# Register the !ENV tag
+yaml.add_constructor('!ENV', construct_env_tag)
 
 import plotly.express as px
 
@@ -35,7 +39,7 @@ from src.models.layout import create_layout
 from src.models.callbacks import register_callbacks
 
 # Load configutration file
-with open('/home/mgamboalerena/Documentos/data_science_portfolio/financial_data/config.yaml', 'r') as file:
+with open(f"{os.environ["DS_DIR"]}/financial_data/config.yaml", 'r') as file:
     config = yaml.safe_load(file)
 
 # Extract the parameters needed for running script from the configuration file
@@ -46,7 +50,7 @@ start_date = config["download_params"]["start_date"]
 end_date = config["download_params"]["end_date"]
 param_to_analyze = config["financial_param"]
 # Paths
-root_dir = config["paths"]["root"]
+root_dir = os.environ["DS_DIR"]+"/"+config["paths"]["root"]
 raw_data_dir = config["paths"]["raw"]
 PATH_RAW_DIR = root_dir+"/"+raw_data_dir
 # Plots
