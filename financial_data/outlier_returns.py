@@ -28,6 +28,7 @@ import plotly.express as px
 from dash import Dash
 
 # Import local module
+from flask import Flask
 from src.data.get_data import load_data
 from src.features.build_features import compute_daily_return
 from src.visualization.plot_lib import (plot_scatter_returns, 
@@ -112,8 +113,13 @@ log_returns_difference = compute_daily_return(data,
                                               data.index, 
                                               [compname1, compname2])
 
+# Create Flask server instance
+server = Flask(__name__)
+
+## Initialize Dash app
+#app = Dash(__name__)
 # Initialize Dash app
-app = Dash(__name__)
+app = dash.Dash(__name__, server=server)  # Attach Flask server
 
 # Generate plots
 fig_log_return = plot_log_return_difference(log_returns_difference, [compname1, compname2])
