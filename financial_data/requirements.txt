@@ -1,8 +1,10 @@
-dash
-plotly
 pandas
 numpy
 gunicorn
 sklearn
 seaborn
 yfinance
+dash==2.14.2
+plotly==5.18.0
+pyyaml==6.0.1
+yaml_env_tag==0.1.6
