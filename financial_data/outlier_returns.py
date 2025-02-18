@@ -49,7 +49,17 @@ logging.info(f"List of files in the current working directory: {os.listdir()}")
 logging.info(f"Environment variables: {os.environ}")
 
 # Load configutration file
-with open(f"./financial_data/config.yaml", 'r') as file:
+print("====================================")
+print(" ")
+print(os.environ["DS_DIR"])
+logging.info(f"Loading configuration file from ./config.yaml")
+# Look if there exists a configuration file
+if not os.path.exists(f"./config.yaml"):
+    logging.error("Configuration file not found.")
+    raise FileNotFoundError("Configuration file not found.")
+print(" ")
+print("====================================")
+with open(f"./config.yaml", 'r') as file:
     config = yaml.safe_load(file)
 
 # Extract the parameters needed for running script from the configuration file

@@ -4,7 +4,7 @@ server:
   debug: True
 # Directory configuration
 paths:
-  root: financial_data/
+  root: ./
   raw: data/raw/
   processed: data/processed/
   reports: reports/
