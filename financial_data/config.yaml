@@ -1,0 +1,42 @@
+# Database configuration
+database:
+  host: localhost
+  port: 5432
+  username: user
+  password: pass
+  database_name: financial_data
+
+# API configuration
+api:
+  base_url: https://api.example.com
+  timeout: 30
+  retry_attempts: 3
+
+# Directory configuration
+paths:
+  root: /home/mgamboalerena/Documentos/data_science_portfolio/financial_data
+  raw: data/raw/
+
+# Feature flags
+features:
+  enable_feature_x: true
+  enable_feature_y: false
+
+# List of supported currencies
+companies_name:
+#  - MELI
+#  - MSFT
+#  - AAPL
+#  - HPQ
+  - QQQ
+  - IWM
+
+download_params:
+  interval: 1d
+  start_date: 2024-02-01
+  end_date: 2025-02-01
+  period: 2y
+
+financial_param: Adj Close
+
+plot_verbosity: False
