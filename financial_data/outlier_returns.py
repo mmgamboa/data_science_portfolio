@@ -45,17 +45,7 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %
 logging.info("Starting the Dash app...")
 
 # Load configutration file
-print("====================================")
-print(" ")
-print(os.environ["DS_DIR"])
-logging.info(f"Loading configuration file from {os.environ['DS_DIR']}/financial_data/config.yaml")
-# Look if there exists a configuration file
-if not os.path.exists(f"{os.environ["DS_DIR"]}/financial_data/config.yaml"):
-    logging.error("Configuration file not found.")
-    raise FileNotFoundError("Configuration file not found.")
-print(" ")
-print("====================================")
-with open(f"{os.environ["DS_DIR"]}/financial_data/config.yaml", 'r') as file:
+with open(f"./financial_data/config.yaml", 'r') as file:
     config = yaml.safe_load(file)
 
 # Extract the parameters needed for running script from the configuration file
