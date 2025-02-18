@@ -35,7 +35,8 @@ def plot_log_return_difference(log_returns_difference,
     # Show and save plot
     if savefig:
         fig.write_image(f"{PATH_REPORTS_DIR}/log_returns_difference_{companies[0]}_{companies[1]}.jpeg")
-    fig.show()
+    
+    return fig
     
 def correlation_heatmap(returns_of_companies):
     corr = returns_of_companies.corr()
@@ -58,4 +59,5 @@ def plot_scatter_returns(log_returns_difference,
     fig.update_yaxes(title_text=ydata_label)
     if savefig:
         fig.write_image(f"{PATH_REPORTS_DIR}/scatter_returns_{companies[0]}_{companies[1]}.jpeg")
-    fig.show()
+    #fig.show()
+    return fig

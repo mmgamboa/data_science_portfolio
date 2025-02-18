@@ -46,7 +46,6 @@ logging.info("Starting the Dash app...")
 logging.info(f"Current working directory: {os.getcwd()}")
 logging.info(f"List of files in the current working directory: {os.listdir()}")
 # Print environment variables
-logging.info(f"Environment variables: {os.environ}")
 
 # Load configutration file
 print("====================================")
@@ -70,13 +69,17 @@ start_date = config["download_params"]["start_date"]
 end_date = config["download_params"]["end_date"]
 param_to_analyze = config["financial_param"]
 # Paths
-root_dir = "./"+config["paths"]["root"]
+if os.uname().nodename=='horizonte':
+    root_dir = os.environ["DS_DIR"]+config["paths"]["root"]
+else:
+    root_dir = "./"
+    
 raw_data_dir = config["paths"]["raw"]
-PATH_RAW_DIR = root_dir+"/"+raw_data_dir
+PATH_RAW_DIR = root_dir+raw_data_dir
 # Plots
 savefigs = config["savefigs"]
 reports_dir = config["paths"]["reports"]
-PATH_REPORTS_DIR = root_dir+"/"+reports_dir
+PATH_REPORTS_DIR = root_dir+reports_dir
 plot_verbosity = config["plot_verbosity"]
 # Server setup
 HOST = config["server"]["host"]
@@ -104,31 +107,18 @@ data = data / data.iloc[0]
 compname1 = companies_name[0]
 compname2 = companies_name[1]
 
-# Plot trends
-if plot_verbosity:
-    fig = px.line(data, title=f"Normalized price of {compname1} and {compname2}")
-    # Show and save plot
-    if savefigs:
-        fig.write_image(f"{PATH_REPORTS_DIR}/normalize_price_{compname1}_{compname2}.jpeg")    
-    fig.show()
-
 # Look at the daily return of elected companies
 log_returns_difference = compute_daily_return(data, 
                                               data.index, 
                                               [compname1, compname2])
 
-if plot_verbosity:
-    plot_log_return_difference(log_returns_difference, 
-                               [compname1, compname2],
-                               PATH_REPORTS_DIR=PATH_REPORTS_DIR,
-                               savefig=savefigs)
-    plot_scatter_returns(log_returns_difference, 
-                         [compname1, compname2],
-                         PATH_REPORTS_DIR=PATH_REPORTS_DIR,
-                         savefig=savefigs)
-
 # Initialize Dash app
 app = Dash(__name__)
+
+# Generate plots
+fig_log_return = plot_log_return_difference(log_returns_difference, [compname1, compname2])
+fig_scatter_return = plot_scatter_returns(log_returns_difference, [compname1, compname2])
+
 
 # Load data (ensure you define these variables)
 dates = data.index.values  # Load your dates
@@ -137,9 +127,8 @@ full_indexes = log_returns_difference.index.values
 xdata_label = compname1
 ydata_label = compname2
 
-# Set app layout
-app.layout = create_layout(dates, 
-                           date_indices)
+# Set the layout with tabs
+app.layout = create_layout(dates, date_indices, fig_log_return, fig_scatter_return)
 
 # Register callbacks
 register_callbacks(app, 
