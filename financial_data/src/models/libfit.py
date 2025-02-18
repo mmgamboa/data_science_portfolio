@@ -38,7 +38,10 @@ def apply_filter_by_dates(data, initial_date, end_date):
     ]
     return pd.DataFrame(filtered_data)
 
-def fit_line(x,y, nvals=100, verbose=True):
+def fit_line(x,
+             y, 
+             nvals=100, 
+             verbose=True):
     """Returns the x_pred and y_pred of the linear regression
     and the model.
     
