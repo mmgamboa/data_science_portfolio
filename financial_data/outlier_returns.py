@@ -56,7 +56,7 @@ start_date = config["download_params"]["start_date"]
 end_date = config["download_params"]["end_date"]
 param_to_analyze = config["financial_param"]
 # Paths
-root_dir = os.environ["DS_DIR"]+"/"+config["paths"]["root"]
+root_dir = "./"+config["paths"]["root"]
 raw_data_dir = config["paths"]["raw"]
 PATH_RAW_DIR = root_dir+"/"+raw_data_dir
 # Plots
