@@ -1,14 +1,19 @@
-# data_science_portfolio
+# Data Science Portfolio
 
-Author: Martín Gamboa.
+**Author**: [Martín Gamboa](https://www.linkedin.com/in/martin-gamboa/).
 
+## Table of contents:
+- [Introduction](#Introduction)
+- [Handling outliers](#Outliers)
+
+## Introduction
 This repository contains a collection of tools, scripts, and Jupyter Notebooks designed to showcase my technical knowledge, tools, and programming style. The repository is primarily for recruiting, HR, and technical teams at companies or organizations that are looking for data scientists, data analysts, data engineers, technical support, or researchers, among other possible positions.
 
 You will find stages of data pre-processing, visualization, engineering, generative AI models, ML, DL, tuning, classifiers, etc.
 
-# Problem 1: Outliers in Regression 
+## Outliers 
 
-## Live Demo 🎉  
+### Live Demo 🎉  
 Check out the live app of `financial_data` here. I am using Render free instance. So it will spin down with inactivity, which can delay requests by 50 seconds or more.
 
 **Situation**. Generate a confident model to fit the trend between the stock prices of two assets. 
