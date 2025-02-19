@@ -4,25 +4,37 @@
 
 ## Table of contents:
 - [Introduction](#Introduction)
-- [Handling outliers](#Outliers)
+- [Stock Price Trend Modeling](#stock-price-trend-modeling)
 
 ## Introduction
 This repository contains a collection of tools, scripts, and Jupyter Notebooks designed to showcase my technical knowledge, tools, and programming style. The repository is primarily for recruiting, HR, and technical teams at companies or organizations that are looking for data scientists, data analysts, data engineers, technical support, or researchers, among other possible positions.
 
 You will find stages of data pre-processing, visualization, engineering, generative AI models, ML, DL, tuning, classifiers, etc.
 
-## Outliers 
+## 📈 Stock Price Trend Modeling
 
-### Live Demo 🎉  
-Check out the live app of `financial_data` here. I am using Render free instance. So it will spin down with inactivity, which can delay requests by 50 seconds or more.
+### **🛠 Situation**  
+We aim to build a **reliable model** that captures the trend between the stock prices of two assets.
 
-**Situation**. Generate a confident model to fit the trend between the stock prices of two assets. 
+### **🎯 Task**  
+Develop a **linear regression model** to fit a trend line. The key challenge is **handling outliers**, especially **borderline cases** where it's unclear whether a data point should be excluded.
 
-**Task**. Create a linear regression model to fit a line. Determine whether an outlier should be considered or discarded when performing linear regression. Special attention is required for borderline cases where it is unclear if the point should be excluded.
+### **⚙️ Approach**  
+- Implement **two outlier detection methods**:  
+  - **Standard Deviation (`std`)**  
+  - **Interquartile Range (`IQR`)**  
+- Use these methods to identify and filter outliers.  
+- Recompute the regression model and metrics while allowing **user-defined thresholds** to account for borderline cases.  
 
-**Action**. Consider two methods to determine outliers: `std` and `IQR`. We will use typical values to discard outliers and apply the model. Consider the accuracy and re-compute the model and the metric accounting border cases within a user-determined threshold. **Generate an easy-to-use** app and deploy it in the cloud. 
+### **🚀 Solution**  
+We created an **interactive web app**, enabling users to:
+- Adjust **outlier detection thresholds** dynamically.
+- Visualize stock price trends and regression results.
+- Compare models with and without outliers.
 
-**Results**. [![View Dashboard](https://img.shields.io/badge/Live_App-Click_Here-brightgreen)](https://financial-data-vybw.onrender.com/)
+### **📊 Results**  
+✅ **Live Dashboard**:  
+[![View Dashboard](https://img.shields.io/badge/Live_App-Click_Here-brightgreen)](https://financial-data-vybw.onrender.com/)
 
 **Data**.
 * QQQ and IWM (used as benchmarks).
