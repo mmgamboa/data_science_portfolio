@@ -6,13 +6,18 @@ This repository contains a collection of tools, scripts, and Jupyter Notebooks d
 
 You will find stages of data pre-processing, visualization, engineering, generative AI models, ML, DL, tuning, classifiers, etc.
 
-# Problem 1: Handling Outliers in Regression or Chi-Square Fitting
+# Problem 1: Outliers in Regression 
 
 ## Live Demo 🎉  
 Check out the live app of `financial_data` here. I am using Render free instance. So it will spin down with inactivity, which can delay requests by 50 seconds or more.
-[![View Dashboard](https://img.shields.io/badge/Live_App-Click_Here-brightgreen)](https://financial-data-vybw.onrender.com/)
 
-**Objective**. Explore different alternatives to determine whether an outlier should be considered or discarded when performing linear regression or chi-square fitting. Special attention is required for borderline cases where it is not evident if the point should be excluded.
+**Situation**. Generate a confident model to fit the trend between the stock prices of two assets. 
+
+**Task**. Create a linear regression model to fit a line. Determine whether an outlier should be considered or discarded when performing linear regression. Special attention is required for borderline cases where it is unclear if the point should be excluded.
+
+**Action**. Consider two methods to determine outliers: `std` and `IQR`. We will use typical values to discard outliers and apply the model. Consider the accuracy and re-compute the model and the metric accounting border cases within a user-determined threshold. **Generate an easy-to-use** app and deploy it in the cloud. 
+
+**Results**. [![View Dashboard](https://img.shields.io/badge/Live_App-Click_Here-brightgreen)](https://financial-data-vybw.onrender.com/)
 
 **Data**.
 * QQQ and IWM (used as benchmarks).
