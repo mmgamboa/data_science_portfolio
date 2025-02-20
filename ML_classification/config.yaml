@@ -1,0 +1,6 @@
+sys_debug: True
+
+server:
+  host: 127.0.0.1
+  port: 8050
+  debug: True
