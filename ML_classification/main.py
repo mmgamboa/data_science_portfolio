@@ -21,28 +21,61 @@ import os
 
 import plotly.express as px
 import plotly.graph_objects as go
+import yaml
+
+from flask import Flask
+from dash import Dash
 
 from src.data.get_data import get_data
+from src.visualization.layout import create_layout
+from src.visualization.show_report_raw_data import inspect_data
+import logging
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Initial log
+logging.info("Starting the Dash app...")
+
+# Read config file
+if not os.path.exists(f"./config.yaml"):
+    logging.error("Configuration file not found.")
+    raise FileNotFoundError("Configuration file not found.")
+print(" ")
+print("====================================")
+with open(f"./config.yaml", 'r') as file:
+    config = yaml.safe_load(file)
+
+sys_debug = config["sys_debug"]
+
+if os.uname().nodename=='horizonte':
+    #root_dir = os.environ["DS_DIR"]+config["paths"]["root"]
+    root_dir = "./"
+    if sys_debug: print(config)
+    HOST = config["server"]["host"]
+    PORT = config["server"]["port"]
+    DEBUG = config["server"]["debug"]
+else:
+    root_dir = "./"
+    HOST = "0.0.0.0"
+    PORT = 8050
+    DEBUG = config["server"]["debug"]
+
+# Get data from ./data/raw/
 train_data, test_data = get_data()
 
-#print(train_data.head())
 
-## Inspect dataset
-# Get the number of families in PassengerId: xxxx_yy means xxxx family and yy member
-aux_data_train = np.array(train_data['PassengerId'].apply(lambda x: np.array(x.split("_"), dtype=int)))
-families = np.vstack(aux_data_train).T[0]
-members = np.vstack(aux_data_train).T[1]
-number_of_families = len(np.unique(families))
-print(f"There are {number_of_families} families in the training data")
-# Same plot in pie chart setting the size of figure tighter
-fig = px.pie(values=np.unique(members, return_counts=True)[1], 
-			 names=np.unique(members, return_counts=True)[0], 
-			 title='Family sizes distribution')
-# Add title to legend
-fig.update_layout(legend_title_text='Family members')
-fig.show()
-train_data_original = train_data.copy()
-print(f"There are {train_data.isna().sum(axis=0).sum()} NaN values in the training data")
-print(f"There are {test_data.isna().sum(axis=0).sum()} NaN values in the test data")
+# Inspect dataset
+## Create Family distribution
+family_distro, homeplanet_distro = inspect_data(train_data, 
+                             verbose=False)
 
+## Create server
+server = Flask(__name__)
+app = Dash(__name__, server=server)
+
+app.layout = create_layout(family_distro, homeplanet_distro)
+
+# Run server
+if __name__ == '__main__':
+    app.run_server(host=HOST, port=PORT, debug=DEBUG)
