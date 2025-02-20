@@ -24,7 +24,7 @@ import plotly.graph_objects as go
 import yaml
 
 from flask import Flask
-from dash import Dash
+from dash import Dash, Input, Output  
 
 from src.data.get_data import get_data
 from src.visualization.layout import create_layout
@@ -70,7 +70,9 @@ train_data, test_data = get_data()
 (family_distro, 
  cryo_sleep_distro,
  homeplanet_distro,
- destinatioplanet_distro) = inspect_data(train_data, 
+ destinatioplanet_distro,
+ age_distro) = inspect_data(train_data, 
+                            age_nbins=50,
                              verbose=False)
 
 ## Create server
@@ -80,7 +82,18 @@ app = Dash(__name__, server=server)
 app.layout = create_layout(family_distro, 
                            cryo_sleep_distro,
                            homeplanet_distro,
-                           destinatioplanet_distro)
+                           destinatioplanet_distro,
+                           age_distro)
+# Callback to update age histogram when slider value changes
+@app.callback(
+    Output('age-histogram', 'figure'),
+    Input('nbins-slider', 'value')
+)
+def update_age_histogram(nbins):
+    fig = px.histogram(train_data, x="Age", nbins=nbins, title="Age Distribution")
+    # Display the number of bins within fig plot
+        
+    return fig
 
 # Run server
 if __name__ == '__main__':

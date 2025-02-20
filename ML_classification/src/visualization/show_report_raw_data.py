@@ -11,6 +11,7 @@ def split_families_and_members(dataset: pd.DataFrame):
     return families, members
 
 def inspect_data(train_dataset, 
+                 age_nbins:int=50,
                  verbose=False):
     
     # Build Family distribution
@@ -18,9 +19,10 @@ def inspect_data(train_dataset,
     cryo_fig = plot_cryo_sleep_distribution(train_dataset, verbose=verbose)
     homeplanet_fig = plot_home_planet_distribution(train_dataset, verbose=verbose)
     destinationplanet_fig = plot_destination_planet_distribution(train_dataset, verbose=verbose)
+    age_fig = plot_age_distribution(train_dataset, nbins=age_nbins, verbose=verbose)
     
     return (family_fig, cryo_fig, homeplanet_fig,
-            destinationplanet_fig)
+            destinationplanet_fig, age_fig)
 
 def plot_family_distribution(dataset: pd.DataFrame,
                              verbose = False):
@@ -90,5 +92,21 @@ def plot_cryo_sleep_distribution(dataset: pd.DataFrame,
     fig.update_traces(marker=dict(colors=['gray' if name == 'Unknown' else None for name in fig.data[0].labels]))
     
     fig.update_layout(legend_title_text='Cryo Sleep')
+    
+    return fig
+
+def plot_age_distribution(dataset: pd.DataFrame,
+                          nbins: int=50,
+                          verbose=False):
+    
+    fig = px.histogram(dataset, x="Age")
+    # Print inside the histogram the bins used in fig
+    fig.add_annotation(
+        text=f"Bins used: {nbins}",  # Display bin count
+        xref="paper", yref="paper",  # Position relative to figure
+        x=0.8, y=0.9,)
+    fig.update_layout(title='Age distribution')
+    fig.update_xaxes(title='Age')
+    fig.update_yaxes(title='Count')
     
     return fig
