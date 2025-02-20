@@ -3,7 +3,9 @@ import pandas as pd
 
 
 def create_layout(family_distro,
+                  cryo_sleep_distro,
                   homeplanet_distro,
+                  destinationplanet_distro,
                   verbose =False):
     if verbose: 
         print("Received figure type:", type(family_distro))
@@ -12,9 +14,10 @@ def create_layout(family_distro,
         # Tabs for different plots
         dcc.Tabs([
             dcc.Tab(label="Inspecting Raw Data", children=[
-                dcc.Graph(figure=family_distro) ,
-            
-                dcc.Graph(figure=homeplanet_distro)  # Second Tab
+                dcc.Graph(figure=family_distro),
+                dcc.Graph(figure=cryo_sleep_distro),
+                dcc.Graph(figure=homeplanet_distro),
+                dcc.Graph(figure=destinationplanet_distro),
             ]),
             dcc.Tab(label="Inspecting Cleaned Data", children=[
                 html.H1("Inspecting Cleaned Data")

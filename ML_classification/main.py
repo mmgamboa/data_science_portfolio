@@ -67,14 +67,20 @@ train_data, test_data = get_data()
 
 # Inspect dataset
 ## Create Family distribution
-family_distro, homeplanet_distro = inspect_data(train_data, 
+(family_distro, 
+ cryo_sleep_distro,
+ homeplanet_distro,
+ destinatioplanet_distro) = inspect_data(train_data, 
                              verbose=False)
 
 ## Create server
 server = Flask(__name__)
 app = Dash(__name__, server=server)
 
-app.layout = create_layout(family_distro, homeplanet_distro)
+app.layout = create_layout(family_distro, 
+                           cryo_sleep_distro,
+                           homeplanet_distro,
+                           destinatioplanet_distro)
 
 # Run server
 if __name__ == '__main__':

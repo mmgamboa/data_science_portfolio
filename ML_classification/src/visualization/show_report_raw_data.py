@@ -15,9 +15,12 @@ def inspect_data(train_dataset,
     
     # Build Family distribution
     family_fig = plot_family_distribution(train_dataset, verbose=verbose)
+    cryo_fig = plot_cryo_sleep_distribution(train_dataset, verbose=verbose)
     homeplanet_fig = plot_home_planet_distribution(train_dataset, verbose=verbose)
+    destinationplanet_fig = plot_destination_planet_distribution(train_dataset, verbose=verbose)
     
-    return family_fig, homeplanet_fig
+    return (family_fig, cryo_fig, homeplanet_fig,
+            destinationplanet_fig)
 
 def plot_family_distribution(dataset: pd.DataFrame,
                              verbose = False):
@@ -32,7 +35,9 @@ def plot_family_distribution(dataset: pd.DataFrame,
     members_with_nan = np.append(members, [np.nan] * dataset['PassengerId'].isna().sum())
     fig = px.pie(values=np.unique(members_with_nan, return_counts=True)[1], 
 			 names=np.unique(members_with_nan, return_counts=True)[0], 
-			 title='Family sizes distribution')
+    title='Family sizes distribution')
+    # Set 'Unknown' color to gray
+    fig.update_traces(marker=dict(colors=['gray' if name == 'Unknown' else None for name in fig.data[0].labels]))
     # Add title to legend
     fig.update_layout(legend_title_text='Family members')
 
@@ -50,6 +55,40 @@ def plot_home_planet_distribution(dataset: pd.DataFrame,
                  names=planets_with_nan.value_counts().index,
                  title="Home Planet distribution")
     fig.update_layout(title='Home Planet distribution')
+    fig.update_traces(marker=dict(colors=['gray' if name == 'Unknown' else None for name in fig.data[0].labels]))
+    
     fig.update_layout(legend_title_text='Home Planet')
+    
+    return fig
+
+def plot_destination_planet_distribution(dataset: pd.DataFrame, 
+                                   verbose=False):
+    # Pie chart for HomePlanet
+    
+    planets_with_nan = dataset['Destination'].fillna('Unknown')
+    
+    fig = px.pie(values=planets_with_nan.value_counts().values, 
+                 names=planets_with_nan.value_counts().index,
+                 title="Destination Planet distribution")
+    fig.update_layout(title='Destination Planet distribution')
+    fig.update_traces(marker=dict(colors=['gray' if name == 'Unknown' else None for name in fig.data[0].labels]))
+    
+    fig.update_layout(legend_title_text='Destination Planet')
+    
+    return fig
+
+def plot_cryo_sleep_distribution(dataset: pd.DataFrame, 
+                                   verbose=False):
+    # Pie chart for HomePlanet
+    
+    sleep_with_nan = dataset['CryoSleep'].fillna('Unknown')
+    
+    fig = px.pie(values=sleep_with_nan.value_counts().values, 
+                 names=sleep_with_nan.value_counts().index,
+                 title="Cryo Sleep distribution")
+    fig.update_layout(title='Cryo Sleep distribution')
+    fig.update_traces(marker=dict(colors=['gray' if name == 'Unknown' else None for name in fig.data[0].labels]))
+    
+    fig.update_layout(legend_title_text='Cryo Sleep')
     
     return fig
