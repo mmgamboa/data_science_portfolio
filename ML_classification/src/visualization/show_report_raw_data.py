@@ -99,13 +99,15 @@ def plot_age_distribution(dataset: pd.DataFrame,
                           nbins: int=50,
                           verbose=False):
     
-    fig = px.histogram(dataset, x="Age")
+    fig = px.histogram(dataset, x="Age", color="Transported", nbins=nbins, title="Age Distribution")
     # Print inside the histogram the bins used in fig
-    fig.add_annotation(
-        text=f"Bins used: {nbins}",  # Display bin count
-        xref="paper", yref="paper",  # Position relative to figure
-        x=0.8, y=0.9,)
-    fig.update_layout(title='Age distribution')
+    #fig.add_annotation(
+    #    text=f"Bins used: {nbins}",  # Display bin count
+    #    font=dict(color="black"),
+    #    # delet arrow
+    #    showarrow=False,
+    #    )
+    fig.update_layout(title='Age distribution - Bins used: {}'.format(nbins))
     fig.update_xaxes(title='Age')
     fig.update_yaxes(title='Count')
     

@@ -21,10 +21,10 @@ def create_layout(family_distro,
                 dcc.Graph(figure=destinationplanet_distro),
 
                 # Histogram with dynamic bin selection
-                html.Label("Select Number of Bins for Age Histogram:"),
-                dcc.Slider(id='nbins-slider', min=2, max=50, step=1, value=10,
-                           marks={i: str(i) for i in range(2, 51, 10)}),
-                dcc.Graph(id='age-histogram')
+                #html.Label("Select Number of Bins for Age Histogram:"),
+                #dcc.Slider(id='nbins-slider', min=2, max=50, step=1, value=10,
+                #           marks={i: str(i) for i in range(2, 51, 10)}),
+                dcc.Graph(id='age-histogram', figure=age_distro)
             ]),
             dcc.Tab(label="Inspecting Cleaned Data", children=[
                 html.H1("Inspecting Cleaned Data")

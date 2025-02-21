@@ -29,6 +29,7 @@ from dash import Dash, Input, Output
 from src.data.get_data import get_data
 from src.visualization.layout import create_layout
 from src.visualization.show_report_raw_data import inspect_data
+from src.models.outliers import outliers
 import logging
 
 # Configure logging
@@ -85,15 +86,17 @@ app.layout = create_layout(family_distro,
                            destinatioplanet_distro,
                            age_distro)
 # Callback to update age histogram when slider value changes
-@app.callback(
-    Output('age-histogram', 'figure'),
-    Input('nbins-slider', 'value')
-)
-def update_age_histogram(nbins):
-    fig = px.histogram(train_data, x="Age", nbins=nbins, title="Age Distribution")
-    # Display the number of bins within fig plot
-        
-    return fig
+
+# There are some columns that are not needed to treat with outliers
+# such as: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, VIP, Name, Transported
+# So columns that will be considered for outlier detection:
+#   Age, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck
+col_outliers = ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
+idx_train_data_outliers = outliers(train_data, 
+                               col_outliers, 
+                               'std',
+                               threshold=3,
+                               verbose=False)
 
 # Run server
 if __name__ == '__main__':
