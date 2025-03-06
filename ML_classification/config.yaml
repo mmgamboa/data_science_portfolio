@@ -1,6 +1,17 @@
 sys_debug: True
+data_debug: True
 
 server:
   host: 127.0.0.1
   port: 8050
   debug: True
+
+inspect_data:
+  age_bins: 50
+
+outliers:
+  method: std # std, iqr
+  threshold_std: 3
+  threshold_iqr: 1.5
+  treatment: remove #nan, remove, replace
+  replace_by: mean #mean, median

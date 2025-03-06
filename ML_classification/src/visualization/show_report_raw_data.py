@@ -21,8 +21,9 @@ def inspect_data(train_dataset,
     destinationplanet_fig = plot_destination_planet_distribution(train_dataset, verbose=verbose)
     age_fig = plot_age_distribution(train_dataset, nbins=age_nbins, verbose=verbose)
     
+    nan_fig = plot_nan_distribution(train_dataset, verbose=verbose)
     return (family_fig, cryo_fig, homeplanet_fig,
-            destinationplanet_fig, age_fig)
+            destinationplanet_fig, age_fig, nan_fig)
 
 def plot_family_distribution(dataset: pd.DataFrame,
                              verbose = False):
@@ -100,15 +101,18 @@ def plot_age_distribution(dataset: pd.DataFrame,
                           verbose=False):
     
     fig = px.histogram(dataset, x="Age", color="Transported", nbins=nbins, title="Age Distribution")
-    # Print inside the histogram the bins used in fig
-    #fig.add_annotation(
-    #    text=f"Bins used: {nbins}",  # Display bin count
-    #    font=dict(color="black"),
-    #    # delet arrow
-    #    showarrow=False,
-    #    )
     fig.update_layout(title='Age distribution - Bins used: {}'.format(nbins))
     fig.update_xaxes(title='Age')
     fig.update_yaxes(title='Count')
+    
+    return fig
+
+def plot_nan_distribution(dataset: pd.DataFrame,
+                          verbose=False):
+    fig = px.bar(x=dataset.columns, y=dataset.isna().sum()/len(dataset)*100, 
+                 title="NaN values distribution")
+    fig.update_layout(title='NaN values distribution (in %)')
+    fig.update_xaxes(title='Columns')
+    fig.update_yaxes(title='NaN values')
     
     return fig

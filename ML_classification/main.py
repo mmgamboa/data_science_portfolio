@@ -18,6 +18,7 @@ Help save them and change history!
 import numpy as np 
 import pandas as pd 
 import os
+import time
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -29,7 +30,7 @@ from dash import Dash, Input, Output
 from src.data.get_data import get_data
 from src.visualization.layout import create_layout
 from src.visualization.show_report_raw_data import inspect_data
-from src.models.outliers import outliers
+from src.models.outliers import outliers, outliers_treatment
 import logging
 
 # Configure logging
@@ -47,7 +48,9 @@ print("====================================")
 with open(f"./config.yaml", 'r') as file:
     config = yaml.safe_load(file)
 
+# Load parameters
 sys_debug = config["sys_debug"]
+data_debug = config["data_debug"]
 
 if os.uname().nodename=='horizonte':
     #root_dir = os.environ["DS_DIR"]+config["paths"]["root"]
@@ -62,30 +65,22 @@ else:
     PORT = 8050
     DEBUG = config["server"]["debug"]
 
+inspect_age_bins = config["inspect_data"]["age_bins"]
+outlier_threshold_std = config["outliers"]["threshold_std"]
+outlier_threshold_iqr = config["outliers"]["threshold_iqr"]
+outlier_detection_method = config["outliers"]["method"]
+outlier_treatment = config["outliers"]["treatment"]
+outlier_replace_by = config["outliers"]["replace_by"]
+#==============================================================================
+#==============================================================================
 # Get data from ./data/raw/
 train_data, test_data = get_data()
 
-
 # Inspect dataset
 ## Create Family distribution
-(family_distro, 
- cryo_sleep_distro,
- homeplanet_distro,
- destinatioplanet_distro,
- age_distro) = inspect_data(train_data, 
-                            age_nbins=50,
-                             verbose=False)
-
-## Create server
-server = Flask(__name__)
-app = Dash(__name__, server=server)
-
-app.layout = create_layout(family_distro, 
-                           cryo_sleep_distro,
-                           homeplanet_distro,
-                           destinatioplanet_distro,
-                           age_distro)
-# Callback to update age histogram when slider value changes
+init_data_to_plot = inspect_data(train_data, 
+                            age_nbins=inspect_age_bins,
+                            verbose=data_debug)
 
 # There are some columns that are not needed to treat with outliers
 # such as: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, VIP, Name, Transported
@@ -94,9 +89,30 @@ app.layout = create_layout(family_distro,
 col_outliers = ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
 idx_train_data_outliers = outliers(train_data, 
                                col_outliers, 
-                               'std',
-                               threshold=3,
-                               verbose=False)
+                               outlier_detection_method,
+                               threshold_std=outlier_threshold_std,
+                               threshold_iqr=outlier_threshold_iqr,
+                               verbose=data_debug)
+# Outliers treatment
+train_data_after_outliers = outliers_treatment(train_data,
+                                               outlier_treatment,
+                                               idx_train_data_outliers,
+                                               replace_by=outlier_replace_by,
+                                               verbose=data_debug)
+# Plot data
+## Create server
+server = Flask(__name__)
+app = Dash(__name__, server=server)
+
+## Create layout
+preproc_data_to_plot = inspect_data(train_data_after_outliers, 
+                                    age_nbins=inspect_age_bins,
+                                    verbose=data_debug)
+app.layout = create_layout(raw_distros=init_data_to_plot,
+                            preprocessed_distros=preproc_data_to_plot,
+                            verbose=data_debug)
+print(f"Updated at {time.localtime().tm_hour}hr {time.localtime().tm_min}min {time.localtime().tm_hour}sec")
+# Callback to update age histogram when slider value changes
 
 # Run server
 if __name__ == '__main__':
