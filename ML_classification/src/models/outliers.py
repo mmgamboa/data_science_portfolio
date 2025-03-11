@@ -63,7 +63,7 @@ def outliers_inner(dataset: pd.DataFrame,
     
     Returns indexes of the outliers in the dataset for each column in columns_outliers    
     """
-    print("[Stage]: Outliers -> detecting ")    
+    print("[Stage]: Outliers -> Detecting ")    
     
     total_length = dataset.shape[0]
     if method=='std':

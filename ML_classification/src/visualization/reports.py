@@ -15,6 +15,11 @@ def input_data_figs(dataset,
 def preproc_data_figs(dataset,
                       age_nbins:int=50,
                       verbose=False):
+    """
+    Generate figures for the preprocessed data
+    dataset: pd.DataFrame
+    age_nbins: int
+    """
     return preproc_data(dataset)
 
 def nan_fig(dataset,

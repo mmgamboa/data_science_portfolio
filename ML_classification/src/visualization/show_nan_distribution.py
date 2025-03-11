@@ -3,6 +3,23 @@ import pandas as pd
 
 def nan_data(dataset,
             verbose=False):
+    """
+    This function receives a dataset and returns a plotly figure with the NaN values distribution.
+    
+    Parameters
+    ----------
+    dataset : pandas.DataFrame
+        The dataset to be analyzed.
+    verbose : bool
+        If True, print additional information.
+
+    Returns
+    -------
+    fig : plotly.graph_objs.Figure
+        A plotly figure with the NaN values distribution
+    """
+    
+    print("[Stage]: NaN -> Detecting ")    
     
     nan_counts = dataset.isna().sum(axis=0)
     if verbose: 
@@ -23,5 +40,7 @@ def nan_data(dataset,
 
     fig.update_xaxes(title='Feature', tickangle=270)  # Rotate labels for readability
     fig.update_yaxes(title='# NaN values')
+    
+    print("[Stage]: NaN -> Done. ")    
     
     return (fig,)

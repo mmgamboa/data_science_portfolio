@@ -20,6 +20,6 @@ def create_layout(raw_distros=None,
             ]),
             dcc.Tab(label="NAN's Distribution", children=[
                 *[dcc.Graph(figure=distro) for distro in nan_distro]
-            ]),
-        ])
+            ]), 
+        ], id = "my-tabs")
     ])
