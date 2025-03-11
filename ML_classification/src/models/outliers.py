@@ -1,7 +1,47 @@
 import numpy as np
 import pandas as pd
 
-def outliers(dataset: pd.DataFrame, 
+def outliers(dataset: pd.DataFrame,
+             columns_outliers: list,
+             detection_method:str,
+             outlier_treatment:str,
+             threshold_std: float=3,
+             threshold_iqr:float=1.5,
+             replace_by:str='mean',
+             verbose:bool=False):
+    """
+    Detect and treat outliers in the dataset
+    dataset: pd.DataFrame
+    columns_outliers: list of str
+    detection_method: str
+        'std' for normal distribution
+        'iqr' for skewed distribution
+    outlier_threshold_std: float
+        Threshold for normal distribution
+    outlier_threshold_iqr: float
+        Threshold for skewed distribution
+    verbose: bool
+        Print status of the process
+        
+    Returns the indexes of the outliers in the dataset for each column in columns_outliers
+    """
+    
+    idx_train_data_outliers = outliers_inner(dataset, 
+                                            columns_outliers, 
+                                            detection_method,
+                                            threshold_std=threshold_std,
+                                            threshold_iqr=threshold_iqr,
+                                            verbose=verbose)
+    # Outliers treatment
+    dataset_after_outliers = outliers_treatment(dataset,
+                                               outlier_treatment,
+                                               idx_train_data_outliers,
+                                               replace_by=replace_by,
+                                               verbose=verbose)
+    return dataset_after_outliers
+             
+
+def outliers_inner(dataset: pd.DataFrame, 
             columns_outliers: list,
             method:str,
             threshold_std: float=3,

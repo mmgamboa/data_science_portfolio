@@ -30,6 +30,7 @@ from dash import Dash, Input, Output
 from src.data.get_data import get_data
 from src.visualization.layout import create_layout
 from src.visualization.show_report_raw_data import inspect_data
+from src.visualization.reports import input_data_figs, preproc_data_figs, nan_fig
 from src.models.outliers import outliers, outliers_treatment
 import logging
 
@@ -78,7 +79,7 @@ train_data, test_data = get_data()
 
 # Inspect dataset
 ## Create Family distribution
-init_data_to_plot = inspect_data(train_data, 
+init_data_to_plot = input_data_figs(train_data, 
                             age_nbins=inspect_age_bins,
                             verbose=data_debug)
 
@@ -87,29 +88,36 @@ init_data_to_plot = inspect_data(train_data,
 # So columns that will be considered for outlier detection:
 #   Age, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck
 col_outliers = ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
-idx_train_data_outliers = outliers(train_data, 
-                               col_outliers, 
-                               outlier_detection_method,
-                               threshold_std=outlier_threshold_std,
-                               threshold_iqr=outlier_threshold_iqr,
-                               verbose=data_debug)
-# Outliers treatment
-train_data_after_outliers = outliers_treatment(train_data,
-                                               outlier_treatment,
-                                               idx_train_data_outliers,
-                                               replace_by=outlier_replace_by,
-                                               verbose=data_debug)
+train_data_after_outliers = outliers(train_data,
+                                     col_outliers, 
+                                     outlier_detection_method,
+                                     outlier_treatment,
+                                     threshold_std=outlier_threshold_std,
+                                     threshold_iqr=outlier_threshold_iqr,                                    
+                                     replace_by=outlier_replace_by,
+                                     verbose=data_debug)
+
+# NaN's treatment
+nan_counts_plot = nan_fig(train_data, verbose=data_debug)
 # Plot data
 ## Create server
 server = Flask(__name__)
 app = Dash(__name__, server=server)
 
+
+
 ## Create layout
-preproc_data_to_plot = inspect_data(train_data_after_outliers, 
-                                    age_nbins=inspect_age_bins,
-                                    verbose=data_debug)
+#preproc_data_to_plot = preproc_data_figs(train_data_after_outliers, 
+#                                    age_nbins=inspect_age_bins,
+#                                    verbose=data_debug)
+preproc_data_to_plot = input_data_figs(train_data_after_outliers, 
+                                       age_nbins=inspect_age_bins,
+                                       verbose=data_debug)
+
+
 app.layout = create_layout(raw_distros=init_data_to_plot,
                             preprocessed_distros=preproc_data_to_plot,
+                            nan_distro=nan_counts_plot,
                             verbose=data_debug)
 print(f"Updated at {time.localtime().tm_hour}hr {time.localtime().tm_min}min {time.localtime().tm_hour}sec")
 # Callback to update age histogram when slider value changes

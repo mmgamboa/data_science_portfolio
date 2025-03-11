@@ -4,6 +4,7 @@ import pandas as pd
 
 def create_layout(raw_distros=None,
                   preprocessed_distros=None,
+                  nan_distro=None,
                   verbose =False):
     if verbose: 
         print("Received figure type:", type(raw_distros[0]))
@@ -16,6 +17,9 @@ def create_layout(raw_distros=None,
             ]),
             dcc.Tab(label="Inspecting Cleaned Data", children=[
                 *[dcc.Graph(figure=distro) for distro in preprocessed_distros]
-            ])
+            ]),
+            dcc.Tab(label="NAN's Distribution", children=[
+                *[dcc.Graph(figure=distro) for distro in nan_distro]
+            ]),
         ])
     ])
