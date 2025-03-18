@@ -11,6 +11,7 @@ def split_families_and_members(dataset: pd.DataFrame):
     return families, members
 
 def inspect_data(train_dataset, 
+                 age_nbins:int=50,
                  verbose=False):
     
     # Build Family distribution
@@ -18,10 +19,34 @@ def inspect_data(train_dataset,
     cryo_fig = plot_cryo_sleep_distribution(train_dataset, verbose=verbose)
     homeplanet_fig = plot_home_planet_distribution(train_dataset, verbose=verbose)
     destinationplanet_fig = plot_destination_planet_distribution(train_dataset, verbose=verbose)
+    age_fig = plot_age_distribution(train_dataset, nbins=age_nbins, verbose=verbose)
+    
+    #nan_fig = plot_nan_distribution(train_dataset, verbose=verbose)
     
     return (family_fig, cryo_fig, homeplanet_fig,
-            destinationplanet_fig)
+            destinationplanet_fig, age_fig)
 
+def box_plot_distro(dataset:pd.DataFrame,
+                    verbose:bool=False):
+    """
+    This function receives a dataset and returns a plotly figure with the box plot distribution.
+    
+    Parameters
+    ----------
+    dataset : pandas.DataFrame
+        The dataset to be analyzed.
+    verbose : bool
+        If True, print additional information.
+        
+    Returns
+    -------
+    fig : plotly.graph_objs.Figure
+        A plotly figure with the box plot distribution
+    """
+    
+    
+    return 
+        
 def plot_family_distribution(dataset: pd.DataFrame,
                              verbose = False):
         # Get number of families
@@ -90,5 +115,26 @@ def plot_cryo_sleep_distribution(dataset: pd.DataFrame,
     fig.update_traces(marker=dict(colors=['gray' if name == 'Unknown' else None for name in fig.data[0].labels]))
     
     fig.update_layout(legend_title_text='Cryo Sleep')
+    
+    return fig
+
+def plot_age_distribution(dataset: pd.DataFrame,
+                          nbins: int=50,
+                          verbose=False):
+    
+    fig = px.histogram(dataset, x="Age", color="Transported", nbins=nbins, title="Age Distribution")
+    fig.update_layout(title='Age distribution - Bins used: {}'.format(nbins))
+    fig.update_xaxes(title='Age')
+    fig.update_yaxes(title='Count')
+    
+    return fig
+
+def plot_nan_distribution(dataset: pd.DataFrame,
+                          verbose=False):
+    fig = px.bar(x=dataset.columns, y=dataset.isna().sum()/len(dataset)*100, 
+                 title="NaN values distribution")
+    fig.update_layout(title='NaN values distribution (in %)')
+    fig.update_xaxes(title='Columns')
+    fig.update_yaxes(title='NaN values')
     
     return fig
