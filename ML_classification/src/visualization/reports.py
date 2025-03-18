@@ -1,6 +1,7 @@
 from .show_report_raw_data import inspect_data
 from .show_report_preprocessed_data import preproc_data
-from .show_nan_distribution import nan_data
+from .feature_display import age_data
+from .nan_distribution import nan_data
 
 def input_data_figs(dataset,
                     age_nbins=50,
@@ -30,3 +31,19 @@ def nan_fig(dataset,
     """
     return nan_data(dataset, verbose)
 
+def preproc_age_fig(train, test,
+                    verbose=False):
+    """
+    Plot age distribution to see uniformity
+    dataset: pd.DataFrame
+    """
+    return age_data(train, test, verbose=verbose)
+    
+#def feature_figs(dataset,
+#                 verbose=False):
+#    """
+#    Plot dynamically feature-feature relations
+#    dataset: pd.DataFrame
+#    """
+#    return feature_data(dataset, 
+#                        verbose=verbose)

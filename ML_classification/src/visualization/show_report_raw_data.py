@@ -21,10 +21,32 @@ def inspect_data(train_dataset,
     destinationplanet_fig = plot_destination_planet_distribution(train_dataset, verbose=verbose)
     age_fig = plot_age_distribution(train_dataset, nbins=age_nbins, verbose=verbose)
     
-    nan_fig = plot_nan_distribution(train_dataset, verbose=verbose)
+    #nan_fig = plot_nan_distribution(train_dataset, verbose=verbose)
+    
     return (family_fig, cryo_fig, homeplanet_fig,
-            destinationplanet_fig, age_fig, nan_fig)
+            destinationplanet_fig, age_fig)
 
+def box_plot_distro(dataset:pd.DataFrame,
+                    verbose:bool=False):
+    """
+    This function receives a dataset and returns a plotly figure with the box plot distribution.
+    
+    Parameters
+    ----------
+    dataset : pandas.DataFrame
+        The dataset to be analyzed.
+    verbose : bool
+        If True, print additional information.
+        
+    Returns
+    -------
+    fig : plotly.graph_objs.Figure
+        A plotly figure with the box plot distribution
+    """
+    
+    
+    return 
+        
 def plot_family_distribution(dataset: pd.DataFrame,
                              verbose = False):
         # Get number of families
