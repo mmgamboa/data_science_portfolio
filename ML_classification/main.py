@@ -34,7 +34,7 @@ from src.visualization.nan_distribution import nan_data
 from src.visualization.layout import create_layout
 from src.visualization.show_report_raw_data import inspect_data
 from src.visualization.reports import input_data_figs, preproc_data_figs, nan_fig, preproc_age_fig
-from src.visualization.features_report import scatter_figs
+from src.visualization.features_report import feature_selection_figs
 from src.models.outliers import outliers, outliers_treatment
 from src.models.scaler import apply_scaler
 from src.features.encoding import encode_data
@@ -104,6 +104,7 @@ train_data_after_outliers = outliers(train_data_copy,
 init_data_to_plot = input_data_figs(train_data, 
                             age_nbins=inspect_age_bins,
                             verbose=data_debug)
+
 preproc_data_to_plot = input_data_figs(train_data_after_outliers, 
                                        age_nbins=inspect_age_bins,
                                        verbose=data_debug)
@@ -126,13 +127,13 @@ X_train, X_test, y_train, y_test = train_test_split(
 ## 3. Feature engineering
 # 3.1 Encode categorical features
 x_train, x_test = encode_data(X_train,#train_data_outliers_scaled, 
-                                    X_test)#test_data)
+                            X_test)#test_data)
 look_at_the_age = preproc_age_fig(x_train, 
                                   x_test, 
                                   verbose=data_debug)
 
-## Plot encoded data: correlation and PCA analysis
-# TBM (to be migrated, it is already done)
+## 4. Feature selection: Correlation and PCA analysis
+corr_pca_figs = feature_selection_figs(x_train, y_train)
 
 ## Create layout
 
@@ -150,16 +151,38 @@ app.layout = create_layout(raw_distros=init_data_to_plot,
                             nan_distro=nan_counts_plot,
                             feature_distro=x_train,
                             age_distro=look_at_the_age,
+                            corr_pca_figs=corr_pca_figs,
+                            raw_data=train_data,
                             verbose=data_debug)
 
 # Callback to update scatter plot
+@app.callback(
+    Output('input-feature-scatter', 'figure'),
+    [Input('input-x-feature', 'value'),
+     Input('input-y-feature', 'value'),
+     Input("x-scale-toggle", "value"),
+     Input("y-scale-toggle", "value")]
+)
+def update_plot(raw_x_feature, 
+                raw_y_feature,
+                x_scale_type,
+                y_scale_type):
+    fig = px.scatter(train_data.copy(), 
+                     x=raw_x_feature, 
+                     y=raw_y_feature, 
+                     color=train_data["Transported"],
+                     opacity=0.5,
+                     title=f"{raw_x_feature} vs {raw_y_feature}")
+    fig.update_layout(yaxis_type=y_scale_type, xaxis_type=x_scale_type)
+    return fig
+
 @app.callback(
     Output('feature-scatter', 'figure'),
     [Input('x-feature', 'value'),
      Input('y-feature', 'value')]
 )
 def update_plot(x_feature, y_feature):
-    fig = px.scatter(x_train, 
+    fig = px.scatter(x_train.copy(), 
                      x=x_feature, 
                      y=y_feature, 
                      color=y_train["Transported"],

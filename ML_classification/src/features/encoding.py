@@ -3,7 +3,9 @@ import numpy as np
 
 from sklearn.preprocessing import LabelEncoder
 
-def encode_data(x_train_dataset, x_test_dataset):
+def encode_data(x_train_dataset, 
+                x_test_dataset,
+                log_scale=False):
     """
     This function receives two datasets and returns two new datasets with the columns processed.
     
@@ -22,8 +24,8 @@ def encode_data(x_train_dataset, x_test_dataset):
     print("[Stage]: Encoding data ... ")    
     X_train = x_train_dataset.copy()
     X_test = x_test_dataset.copy()
-    X_train.drop(columns='Name', inplace=True)
-    X_test.drop(columns='Name', inplace=True)
+    #X_train.drop(columns='Name', inplace=True)
+    #X_test.drop(columns='Name', inplace=True)
     
     x_train, deck_col, side_col, labels_age_bins = encode(X_train, 
                                                         data_set='train')
@@ -38,6 +40,8 @@ def encode_data(x_train_dataset, x_test_dataset):
                     side_col_train=side_col,
                     age_bins=labels_age_bins)
     x_test = x_test.reindex(columns=x_train.columns)
+    
+    
     
     print("[Stage]: Encoding data --> Done. ")    
 
@@ -89,6 +93,40 @@ def encode(dataset,
                                       data_set=data_set, 
                                       label_age_bins=age_bins)
         return dataset
+
+def proc_name(dataset,
+              method='tf-idf'):
+    # check method
+    if method not in ['tf-idf', 'kmeans']:
+        print("Method not found. Please choose between 'tf-idf' and 'kmeans'.")
+        return dataset
+    
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    # Load dataset
+    df = dataset.copy()#
+    # Handle missing names
+    df["Name"] = df["Name"].fillna("Unknown")
+    if method=='tf-idf':
+        # Apply TF-IDF
+        vectorizer = TfidfVectorizer(max_features=50)  # Limit features to avoid high dimensionality
+        name_features = vectorizer.fit_transform(df["Name"])
+        # Convert to DataFrame and merge
+        name_features_df = pd.DataFrame(name_features.toarray(), columns=vectorizer.get_feature_names_out())
+        df = pd.concat([df, name_features_df], axis=1)
+        
+        # Drop original name column if not needed
+        df.drop("Name", axis=1, inplace=True)
+    elif method=='kmeans':
+        from sklearn.cluster import KMeans
+        # TF-IDF vectorization
+        vectorizer = TfidfVectorizer(max_features=50)
+        name_vectors = vectorizer.fit_transform(df)
+
+        # Apply KMeans clustering
+        kmeans = KMeans(n_clusters=10, random_state=42)
+        df["Name_Cluster"] = kmeans.fit_predict(name_vectors)
+
+    return df
 
 def proc_passengerId(dataset):
     """
