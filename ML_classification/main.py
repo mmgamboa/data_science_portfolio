@@ -38,6 +38,15 @@ from src.visualization.features_report import feature_selection_figs
 from src.models.outliers import outliers, outliers_treatment
 from src.models.scaler import apply_scaler
 from src.features.encoding import encode_data
+from src.visualization.callbacks import register_callbacks
+
+# ML models
+from src.models.classification import ClassificationModel
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import confusion_matrix
+
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+
 import logging
 
 # Configure logging
@@ -85,14 +94,16 @@ train_data, test_data = get_data()
 
 ### 1. Data preprocessing
 ## 1.1 Handling missing values
-_ = nan_data(train_data, verbose=data_debug)  # just to printout the statistics
-nan_counts_plot = nan_fig(train_data, verbose=data_debug)
+_ = nan_data(train_data.copy(), 
+             verbose=data_debug)  # just to printout the statistics
+nan_counts_plot = nan_fig(train_data.copy(), 
+                          verbose=data_debug)
 ## 1.2 Detect & remove outliers
 # Columns that do not need outliers treatment: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, VIP, Name, Transported 
 # Columns that do need outliers treatment: Age, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck
 col_outliers = ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
-train_data_copy=train_data.__deepcopy__()
-train_data_after_outliers = outliers(train_data_copy,
+#train_data_copy=train_data.__deepcopy__()
+train_data_after_outliers = outliers(train_data.copy(),
                                      col_outliers, 
                                      outlier_detection_method,
                                      outlier_treatment,
@@ -134,18 +145,57 @@ look_at_the_age = preproc_age_fig(x_train,
 
 ## 4. Feature selection: Correlation and PCA analysis
 corr_pca_figs = feature_selection_figs(x_train, y_train)
+# Drop non-relevant components
+
+## 5. Model selection
+# 5.1 Train a model
+xgmodel = ClassificationModel(which_model='xgboost')
+model_trained = xgmodel.train(x_train, y_train)
+# 5.2 Evaluate the model and # 5.3 Asses performance
+print(model_trained)
+predictions = model_trained.predict(x_test.drop(columns=['PassengerId', 'Name']))
+def compute_metrics(y_true, y_pred, mode='binary', y_prob=None):
+    full_metrics={}
+    full_metrics['precision'] = precision_score(y_true, y_pred, average=mode)
+    full_metrics['recall'] = recall_score(y_true, y_pred, average=mode)
+    full_metrics['f1_score'] = f1_score(y_true, y_pred, average=mode)
+    full_metrics['accuracy'] = accuracy_score(y_true, y_pred)
+    if y_prob is None:
+        full_metrics['roc_auc'] = roc_auc_score(y_true, y_pred)
+    else: 
+        full_metrics['roc_auc'] = roc_auc_score(y_true, y_prob)
+    # Confusion matrix
+    full_metrics['confusion_matrix'] = confusion_matrix(y_true, y_pred)
+    # Classification report
+    full_metrics['classification_report'] = classification_report(y_true, y_pred)
+    
+    def plot_confusion_matrix(metrics):
+        conf_matrix = metrics['confusion_matrix']
+        conf_matrix_fig = px.imshow(conf_matrix, 
+                                    labels=dict(x="Predicted", y="Actual", color="Count"),
+                                    x=['Not Transported', 'Transported'],
+                                    y=['Not Transported', 'Transported'],
+                                    title="Confusion Matrix")
+
+        conf_matrix_fig.update_layout(coloraxis_showscale=False)
+        
+        return conf_matrix_fig
+    
+    full_metrics['confusion_matrix_fig'] = plot_confusion_matrix(full_metrics)
+    
+    return full_metrics
+
+metrics = compute_metrics(y_test, predictions)
+# Plot Confusion Matrix
+
+
 
 ## Create layout
-
-
-# Plot features
-#feature_figs = scatter_figs(x_train, y_train)
-# Plot data
-## Create server
+# Create server
 server = Flask(__name__)
 app = Dash(__name__, server=server)
-
-
+# Callbacks for interactive plots
+register_callbacks(app, train_data, x_train, y_train)
 app.layout = create_layout(raw_distros=init_data_to_plot,
                             preprocessed_distros=preproc_data_to_plot,
                             nan_distro=nan_counts_plot,
@@ -153,46 +203,10 @@ app.layout = create_layout(raw_distros=init_data_to_plot,
                             age_distro=look_at_the_age,
                             corr_pca_figs=corr_pca_figs,
                             raw_data=train_data,
+                            ml_model=metrics,
                             verbose=data_debug)
 
-# Callback to update scatter plot
-@app.callback(
-    Output('input-feature-scatter', 'figure'),
-    [Input('input-x-feature', 'value'),
-     Input('input-y-feature', 'value'),
-     Input("x-scale-toggle", "value"),
-     Input("y-scale-toggle", "value")]
-)
-def update_plot(raw_x_feature, 
-                raw_y_feature,
-                x_scale_type,
-                y_scale_type):
-    fig = px.scatter(train_data.copy(), 
-                     x=raw_x_feature, 
-                     y=raw_y_feature, 
-                     color=train_data["Transported"],
-                     opacity=0.5,
-                     title=f"{raw_x_feature} vs {raw_y_feature}")
-    fig.update_layout(yaxis_type=y_scale_type, xaxis_type=x_scale_type)
-    return fig
-
-@app.callback(
-    Output('feature-scatter', 'figure'),
-    [Input('x-feature', 'value'),
-     Input('y-feature', 'value')]
-)
-def update_plot(x_feature, y_feature):
-    fig = px.scatter(x_train.copy(), 
-                     x=x_feature, 
-                     y=y_feature, 
-                     color=y_train["Transported"],
-                     opacity=0.5,
-                     title=f"{x_feature} vs {y_feature}")
-    return fig
-
-
 print(f"Updated at {time.localtime().tm_hour}hr {time.localtime().tm_min}min {time.localtime().tm_hour}sec")
-# Callback to update age histogram when slider value changes
 
 # Run server
 if __name__ == '__main__':

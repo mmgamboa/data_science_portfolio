@@ -9,6 +9,7 @@ def create_layout(raw_distros=None,
                   age_distro=None,
                   corr_pca_figs=None,
                   raw_data=None,
+                  ml_model=None,
                   verbose =False):
     if verbose: 
         print("Received figure type:", type(raw_distros[0]))
@@ -21,6 +22,16 @@ def create_layout(raw_distros=None,
         html.H1("Titanic Spaceship Data Analysis"),
         # Tabs for different plots
         dcc.Tabs([
+            dcc.Tab(label="Model Performance", children=[
+                html.H1("Model Performance"),
+                html.H2(f"Model accuracy: {ml_model['accuracy']}"),
+                html.H2(f"Model precision: {ml_model['precision']}"),
+                html.H2(f"Model recall: {ml_model['recall']}"),
+                html.H2(f"Model f1-score: {ml_model['f1_score']}"),
+                #html.H2(f"Model confusion matrix: {ml_model['confusion_matrix']}"),
+                dcc.Graph(figure=ml_model['confusion_matrix_fig']),
+                html.H2(f"Model classification report: {ml_model['classification_report']}"),
+            ]),
             dcc.Tab(label="Feature-Feature Analysis", children=[
             #html.H1("Feature-Feature Scatter Plot"),
             # Dropdowns to select X and Y features
@@ -28,13 +39,13 @@ def create_layout(raw_distros=None,
             dcc.Dropdown(
                 id='x-feature',
                 options=[{'label': col, 'value': col} for col in num_columns],
-                value=num_columns[0]  # Default selection
+                value="Age"  # Default selection
             ),
             html.Label("Select Y-axis Feature:"),
             dcc.Dropdown(
                 id='y-feature',
                 options=[{'label': col, 'value': col} for col in num_columns],
-                value=num_columns[1]  # Default selection
+                value="TotalServices"  # Default selection
             ),
             # Scatter plot
             dcc.Graph(id='feature-scatter'),
@@ -58,13 +69,13 @@ def create_layout(raw_distros=None,
                         dcc.Dropdown(
                             id='input-x-feature',
                             options=[{'label': col, 'value': col} for col in raw_columns],
-                            value=raw_columns[0]
+                            value="Age"
                         ),
                         html.Label("Select Y-axis Feature:"),
                         dcc.Dropdown(
                             id='input-y-feature',
                             options=[{'label': col, 'value': col} for col in raw_columns],
-                            value=raw_columns[1]
+                            value="ShoppingMall"#raw_columns[1]
                         ),
                         html.Label("Select X-Scale:"),
                         dcc.RadioItems(
