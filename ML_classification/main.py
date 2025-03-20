@@ -42,25 +42,25 @@ from src.visualization.callbacks import register_callbacks
 
 # ML models
 from src.models.classification import ClassificationModel
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.metrics import confusion_matrix
-
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-
+from src.models.metrics import compute_metrics
 import logging
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Initial log
 logging.info("Starting the Dash app...")
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
+# Print current working directory and listed files
+logging.info(f"Current working directory: {os.getcwd()}")
+logging.info(f"List of files in the current working directory: {os.listdir()}")
+# Print environment variables
+
+# Load configutration file
 # Read config file
 if not os.path.exists(f"./config.yaml"):
     logging.error("Configuration file not found.")
     raise FileNotFoundError("Configuration file not found.")
-print(" ")
-print("====================================")
+
 with open(f"./config.yaml", 'r') as file:
     config = yaml.safe_load(file)
 
@@ -71,7 +71,8 @@ data_debug = config["data_debug"]
 if os.uname().nodename=='horizonte':
     #root_dir = os.environ["DS_DIR"]+config["paths"]["root"]
     root_dir = "./"
-    if sys_debug: print(config)
+    if sys_debug: 
+        print(config)
     HOST = config["server"]["host"]
     PORT = config["server"]["port"]
     DEBUG = config["server"]["debug"]
@@ -87,6 +88,9 @@ outlier_threshold_iqr = config["outliers"]["threshold_iqr"]
 outlier_detection_method = config["outliers"]["method"]
 outlier_treatment = config["outliers"]["treatment"]
 outlier_replace_by = config["outliers"]["replace_by"]
+col_outliers = config['outliers']['columns']
+# ML model
+model_name = config["model"]["name"]
 #==============================================================================
 #==============================================================================
 ### Get data from ./data/raw/
@@ -99,9 +103,6 @@ _ = nan_data(train_data.copy(),
 nan_counts_plot = nan_fig(train_data.copy(), 
                           verbose=data_debug)
 ## 1.2 Detect & remove outliers
-# Columns that do not need outliers treatment: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, VIP, Name, Transported 
-# Columns that do need outliers treatment: Age, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck
-col_outliers = ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
 #train_data_copy=train_data.__deepcopy__()
 train_data_after_outliers = outliers(train_data.copy(),
                                      col_outliers, 
@@ -137,8 +138,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 ## 3. Feature engineering
 # 3.1 Encode categorical features
-x_train, x_test = encode_data(X_train,#train_data_outliers_scaled, 
-                            X_test)#test_data)
+x_train, x_test = encode_data(X_train,
+                            X_test,
+                            verbose=data_debug)
 look_at_the_age = preproc_age_fig(x_train, 
                                   x_test, 
                                   verbose=data_debug)
@@ -149,46 +151,12 @@ corr_pca_figs = feature_selection_figs(x_train, y_train)
 
 ## 5. Model selection
 # 5.1 Train a model
-xgmodel = ClassificationModel(which_model='xgboost')
+xgmodel = ClassificationModel(which_model=model_name)
 model_trained = xgmodel.train(x_train, y_train)
 # 5.2 Evaluate the model and # 5.3 Asses performance
-print(model_trained)
 predictions = model_trained.predict(x_test.drop(columns=['PassengerId', 'Name']))
-def compute_metrics(y_true, y_pred, mode='binary', y_prob=None):
-    full_metrics={}
-    full_metrics['precision'] = precision_score(y_true, y_pred, average=mode)
-    full_metrics['recall'] = recall_score(y_true, y_pred, average=mode)
-    full_metrics['f1_score'] = f1_score(y_true, y_pred, average=mode)
-    full_metrics['accuracy'] = accuracy_score(y_true, y_pred)
-    if y_prob is None:
-        full_metrics['roc_auc'] = roc_auc_score(y_true, y_pred)
-    else: 
-        full_metrics['roc_auc'] = roc_auc_score(y_true, y_prob)
-    # Confusion matrix
-    full_metrics['confusion_matrix'] = confusion_matrix(y_true, y_pred)
-    # Classification report
-    full_metrics['classification_report'] = classification_report(y_true, y_pred)
-    
-    def plot_confusion_matrix(metrics):
-        conf_matrix = metrics['confusion_matrix']
-        conf_matrix_fig = px.imshow(conf_matrix, 
-                                    labels=dict(x="Predicted", y="Actual", color="Count"),
-                                    x=['Not Transported', 'Transported'],
-                                    y=['Not Transported', 'Transported'],
-                                    title="Confusion Matrix")
-
-        conf_matrix_fig.update_layout(coloraxis_showscale=False)
-        
-        return conf_matrix_fig
-    
-    full_metrics['confusion_matrix_fig'] = plot_confusion_matrix(full_metrics)
-    
-    return full_metrics
-
+# 5.3 Asses performance
 metrics = compute_metrics(y_test, predictions)
-# Plot Confusion Matrix
-
-
 
 ## Create layout
 # Create server

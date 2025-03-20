@@ -73,7 +73,6 @@ def pca_analysis_fig(X, y, verbose=False):
     X_scaled = np.nan_to_num(X_scaled_, nan=-1.0)
     # Step 2: Apply PCA
     pca = PCA()  # You can also specify the number of components like PCA(n_components=5)
-    print(X_scaled.shape)
     X_new = pca.fit_transform(X_scaled)#.dropna())
 
     # Step 3: Analyze the explained variance

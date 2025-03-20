@@ -67,14 +67,14 @@ def outliers_inner(dataset: pd.DataFrame,
     
     total_length = dataset.shape[0]
     if method=='std':
-        print("... with Std method")
+        print("\t... with Std method")
         idx_outliers = outliers_norm_distro(dataset, 
                                             columns_outliers,
                                             threshold=threshold_std,
                                             verbose=verbose)
     
     elif method=='iqr':
-        print("... with IQR method")
+        print("\t... with IQR method")
         idx_outliers = outliers_skewed_distro(dataset, 
                                               columns_outliers,
                                               threshold=threshold_iqr,
@@ -96,7 +96,7 @@ def outliers_norm_threshold(dataset,
     
     Returns low_value, high_value
     """
-    print(f"\tComputing threshold for normal distribution...")
+    print(f"\t \tComputing threshold for normal distribution...")
     aux_data = dataset.copy()
     aux_data = aux_data[columns]
 

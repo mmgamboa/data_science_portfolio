@@ -1,0 +1,10 @@
+numpy
+gunicorn
+scikit-learn
+seaborn
+yfinance
+kaleido
+pandas==2.1.4
+dash==2.14.2
+plotly==5.18.0
+pyyaml==6.0
