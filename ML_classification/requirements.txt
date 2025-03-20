@@ -1,6 +1,7 @@
 numpy
 gunicorn
 scikit-learn
+xgboost
 seaborn
 yfinance
 kaleido
