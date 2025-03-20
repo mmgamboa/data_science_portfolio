@@ -5,7 +5,8 @@ from sklearn.preprocessing import LabelEncoder
 
 def encode_data(x_train_dataset, 
                 x_test_dataset,
-                log_scale=False):
+                log_scale=False,
+                verbose=False):
     """
     This function receives two datasets and returns two new datasets with the columns processed.
     
@@ -28,7 +29,8 @@ def encode_data(x_train_dataset,
     #X_test.drop(columns='Name', inplace=True)
     
     x_train, deck_col, side_col, labels_age_bins = encode(X_train, 
-                                                        data_set='train')
+                                                        data_set='train',
+                                                        verbose=verbose)
     ## Store Transported column in y_train maintaining pandas.DataFrame format
     #y_train = pd.DataFrame(x_train['Transported'])
     ## Drop Transported column from x_train  
@@ -38,7 +40,8 @@ def encode_data(x_train_dataset,
                     data_set='test',
                     deck_col_train=deck_col,
                     side_col_train=side_col,
-                    age_bins=labels_age_bins)
+                    age_bins=labels_age_bins,
+                    verbose=verbose)
     x_test = x_test.reindex(columns=x_train.columns)
     
     
@@ -52,7 +55,8 @@ def encode(dataset,
            deck_col_train=None,
            side_col_train=None,
            age_bins=None,
-           q=5):
+           q=5,
+           verbose=False):
     """
     This function receives a dataset and returns a new dataset with the columns processed.
     
@@ -78,20 +82,24 @@ def encode(dataset,
         dataset = func(dataset)
     if data_set=='train':
         dataset, deck_col_train, side_col_train = proc_Cabin(dataset, 
-                                                             data_set=data_set)
+                                                             data_set=data_set,
+                                                             verbose=verbose)
         dataset, labels_age_bins = proc_createFeatures(dataset, 
                                                        q=q, 
-                                                       data_set=data_set)
+                                                       data_set=data_set,
+                                                       verbose=verbose)
         return dataset, deck_col_train, side_col_train, labels_age_bins
     else: 
         dataset = proc_Cabin(dataset, 
                              data_set,
                              deck_col_train=deck_col_train, 
-                             side_col_train=side_col_train)
+                             side_col_train=side_col_train,
+                             verbose=verbose)
         dataset = proc_createFeatures(dataset, 
                                       q=q, 
                                       data_set=data_set, 
-                                      label_age_bins=age_bins)
+                                      label_age_bins=age_bins,
+                                      verbose=verbose)
         return dataset
 
 def proc_name(dataset,
@@ -251,7 +259,9 @@ def proc_CryoSleep(dataset):
     return dataset
 
 def proc_Cabin(dataset, data_set='train', 
-               deck_col_train=None, side_col_train=None):
+               deck_col_train=None, 
+               side_col_train=None,
+               verbose=False):
     """
     This function receives a dataset and returns a new dataset with the Cabin column processed.
     It generates new columns from Cabin to Deck, Num and Side.
@@ -302,8 +312,8 @@ def proc_Cabin(dataset, data_set='train',
     if data_set == 'test':
         missing_deck = set(deck_col_train) -set(deck_columns)
         missing_side = set(side_col_train) -set(side_columns)
-        print("Missing Deck", missing_deck)
-        print("Missing Side", missing_side)
+        if verbose: print("Missing Deck", missing_deck)
+        if verbose: print("Missing Side", missing_side)
         for col in missing_deck:
             dataset[col] = np.nan
             deck_columns.append(col)
@@ -327,10 +337,10 @@ def proc_Cabin(dataset, data_set='train',
         return dataset
 
 def proc_createFeatures(dataset,
-                       verbose=False,
                        q=5,
                        data_set='train',
-                       label_age_bins=None):
+                       label_age_bins=None,
+                       verbose=False):
     """
     This function receives a dataset and returns a new dataset with the columns processed.
     It generates new columns from the columns 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck'.
@@ -350,10 +360,17 @@ def proc_createFeatures(dataset,
     dataset = feature_TotalService(dataset)
     # Group the 'Age' feature into bins maintaining the proportions of number of passengers in each bin
     if data_set=='train':
-        dataset, labels = feature_GroupByAge(dataset, q=q, data_set=data_set)
+        dataset, labels = feature_GroupByAge(dataset, 
+                                             q=q, 
+                                             data_set=data_set,
+                                             verbose=verbose)
         return dataset, labels
     else:
-        dataset = feature_GroupByAge(dataset, q=q, data_set=data_set, groupedage_columns_train=label_age_bins)
+        dataset = feature_GroupByAge(dataset, 
+                                     q=q, 
+                                     data_set=data_set, 
+                                     groupedage_columns_train=label_age_bins,
+                                     verbose=verbose)
     
     return dataset
 
@@ -372,7 +389,8 @@ def feature_TotalService(dataset):
 def feature_GroupByAge(dataset, 
                 q=5, 
                 data_set='train',
-                groupedage_columns_train=None):
+                groupedage_columns_train=None,
+                verbose=False):
 
 	# Group the 'Age' feature into bins maintaining the proportions of number of passengers in each bin
 	# Each bin has to have the same number of passengers
@@ -388,7 +406,7 @@ def feature_GroupByAge(dataset,
 
 		# Step 4: One-hot encode 'GroupedAge' and 'Side'
 		dataset = pd.get_dummies(dataset, columns=['GroupedAge'], drop_first=False)
-		print("GropuedAge uniquevalues", labels)
+		if verbose: print("GroupedAge uniquevalues", labels)
 		return dataset, labels
 	# Get all new columns starting with GroupedAge_
 	#groupedage_columns = [col for col in X.columns if col.startswith('GroupedAge_')]

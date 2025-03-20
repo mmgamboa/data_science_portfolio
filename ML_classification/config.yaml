@@ -1,5 +1,5 @@
-sys_debug: True
-data_debug: True
+sys_debug: False
+data_debug: False
 
 server:
   host: 127.0.0.1
@@ -8,10 +8,22 @@ server:
 
 inspect_data:
   age_bins: 50
-
+  
 outliers:
   method: std # std, iqr
   threshold_std: 3
   threshold_iqr: 1.5
   treatment: remove #nan, remove, replace
   replace_by: mean #mean, median
+  columns: ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
+
+model:
+  target: 'Rating'
+  features: ['Age', 'RoomService', 'FoodCourt', 'ShoppingMall', 'Spa', 'VRDeck']
+  test_size: 0.2
+  random_state: 0
+  #name: 'RandomForestRegressor'
+  name: 'xgboost'
+  n_estimators: 100
+  max_depth: 6
+  cv: 5
