@@ -49,4 +49,4 @@ We created an **interactive web app**, enabling users to:
 ### **🚀 Solution**  
 ### **📊 Results**  
 ✅ **Live Dashboard**:
-[![View Dashboard](https://img.shields.io/badge/Live_App-Click_Here-brightgreen)](https://financial-data-vybw.onrender.com/)
+[![View Dashboard](https://img.shields.io/badge/Live_App-Click_Here-brightgreen)](https://data-science-portfolio-f9qz.onrender.com/)
